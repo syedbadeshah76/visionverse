@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website</title>
+    <!-- Tailwind CSS CDN for utility classes -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Font - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom CSS for effects and animations */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Prevent horizontal scroll due to animations */
+            background-color: #1a202c; /* Dark background */
+            color: #e2e8f0; /* Light text */
+        }
+
+        /* Navigation Bar Styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(26, 32, 44, 0.9); /* Slightly transparent dark background */
+            z-index: 100;
+            backdrop-filter: blur(5px); /* Frosted glass effect */
+            -webkit-backdrop-filter: blur(5px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar-link {
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .navbar-link:hover {
+            color: #9f7aea; /* Purple on hover */
+            transform: translateY(-2px); /* Slight lift on hover */
+        }
+
+        /* Mobile Menu Button */
+        .menu-button {
+            display: none; /* Hidden by default on larger screens */
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            color: white;
+            z-index: 101; /* Ensure button is above nav-links when expanded */
+        }
+
+        /* Mobile Menu Icon (Hamburger) */
+        .menu-icon {
+            width: 28px;
+            height: 28px;
+        }
+
+        /* Responsive Navbar Links Container */
+        .nav-links {
+            display: flex;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            max-height: 500px; /* Max height for open state */
+            opacity: 1;
+        }
+
+        /* Initially hide on mobile */
+        @media (max-width: 767px) {
+            .menu-button {
+                display: block; /* Show hamburger on small screens */
+            }
+            .nav-links {
+                position: absolute; /* Position relative to the navbar */
+                top: 100%; /* Below the navbar */
+                left: 0;
+                flex-direction: column;
+                width: 100%;
+                text-align: center;
+                background-color: rgba(26, 32, 44, 0.95); /* Slightly darker background for overlay */
+                max-height: 0; /* Hidden state */
+                overflow: hidden; /* Hide overflow when collapsed */
+                opacity: 0; /* Fade out when collapsed */
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            }
+            .nav-links.active {
+                max-height: 500px; /* Show when active */
+                opacity: 1; /* Fade in when active */
+                padding-bottom: 1rem; /* Add some padding at the bottom when open */
+            }
+            .navbar-link {
+                padding: 0.75rem 0; /* More padding for mobile links */
+                display: block; /* Make links take full width */
+            }
+        }
+
+
+        .hero-section {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            text-align: center;
+            color: white;
+            padding-top: 4rem; /* To account for fixed navbar height */
+        }
+
+        .parallax-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120%; /* Slightly taller to allow parallax movement */
+            background-image: url('bg1.jpg'); /* Placeholder image */
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            transform: translateY(0); /* Will be animated by JS */
+            transition: transform 0.1s ease-out; /* Smooth transition for parallax */
+        }
+
+        .hero-content {
+            z-index: 10;
+            padding: 1.5rem; /* p-6 */
+        }
+
+        .animated-gradient-button {
+            background: linear-gradient(90deg, #6366F1 0%, #EC4899 100%);
+            background-size: 200% auto;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-position 0.5s ease-out, transform 0.2s ease-out;
+        }
+
+        .animated-gradient-button:hover {
+            background-position: right center; /* Move gradient on hover */
+            transform: scale(1.05); /* Slight scale on hover */
+        }
+
+        /* Card Styles (removed 3D specific transforms for static design) */
+        .card-container {
+            border-radius: 1rem; /* rounded-xl */
+            transition: transform 0.3s ease-out; /* Keep hover effect */
+        }
+
+        .card-inner {
+            background-color: rgba(45, 55, 72, 0.7); /* bg-gray-700 with transparency */
+            border-radius: 1rem; /* rounded-xl */
+            padding: 2rem; /* p-8 */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-xl */
+        }
+
+        /* Floating effect for hero elements (subtle animation) */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Testimonial specific styles */
+        .testimonial-card .quote-icon {
+            font-size: 3rem; /* Larger quote icon */
+            color: #EC4899; /* Pink color */
+        }
+
+        /* Footer Responsive adjustments */
+        .footer-links {
+            display: flex;
+            flex-direction: column; /* Stack vertically by default */
+            align-items: center;
+            gap: 0.5rem; /* Space between stacked links */
+        }
+
+        @media (min-width: 768px) { /* On medium screens and up */
+            .footer-links {
+                flex-direction: row; /* Row direction */
+                justify-content: center; /* Center horizontally */
+                gap: 1.5rem; /* Larger space between links */
+            }
+        }
+
+        /* New styles for scroll-based fade-in animation */
+        .fade-in-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-in-on-scroll.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar py-4 px-6">
+        <div class="container mx-auto flex justify-between items-center relative"> <!-- Added relative for mobile nav positioning -->
+            <a href="#" class="text-3xl font-bold text-white hover:text-indigo-400 transition-colors duration-300">
+                VisionVerse.
+            </a>
+            <!-- Mobile Menu Button (Hamburger Icon) -->
+            <button class="menu-button" id="menuButton" aria-label="Toggle navigation">
+                <svg class="menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <div class="nav-links space-x-8 text-lg md:flex" id="navLinks">
+                <a href="#home" class="navbar-link text-white">Home</a>
+                <a href="#features" class="navbar-link text-white">Features</a>
+                <a href="#testimonials" class="navbar-link text-white">Testimonials</a>
+                <a href="#services" class="navbar-link text-white">Services</a>
+                <a href="#contact-section" class="navbar-link text-white">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section with Parallax Background -->
+    <section class="hero-section" id="home">
+        <div class="parallax-bg" id="parallaxBg"></div>
+        <div class="hero-content float-animation max-w-4xl mx-auto">
+            <h1 class="text-5xl md:text-7xl font-bold mb-4 leading-tight">
+                Crafting Immersive <span class="text-indigo-400">Digital Experiences</span>
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 opacity-90">
+                Explore the future of web design with stunning digital visuals and interactive elements.
+            </p>
+            <button class="animated-gradient-button px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl">
+                Discover More
+            </button>
+        </div>
+    </section>
+
+    <!-- Features Section with Cards -->
+    <section class="py-20 px-6 bg-gray-900 min-h-screen flex items-center justify-center fade-in-on-scroll" id="features">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 text-indigo-300">
+                Our Cutting-Edge Features
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <!-- Card 1 -->
+                <div class="card-container p-4">
+                    <div class="card-inner flex flex-col items-center justify-center text-center">
+                        <svg class="w-20 h-20 mb-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L19.5 7.25M21 12.75V19.5a2.25 2.25 0 01-2.25 2.25H4.5A2.25 2.25 0 012.25 19.5V7.25A2.25 2.25 0 014.5 5H11"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.75 5.25L14.25 6.75M16.5 4.5L15 6M18 3.75L16.5 5.25M17.25 6.75L18.75 5.25"></path>
+                        </svg>
+                        <h3 class="text-3xl font-semibold mb-4">Responsive Design</h3>
+                        <p class="text-lg opacity-80">
+                            Seamlessly adapts to any screen size, from mobile to desktop, ensuring a perfect view every time.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="card-container p-4">
+                    <div class="card-inner flex flex-col items-center justify-center text-center">
+                        <svg class="w-20 h-20 mb-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="text-3xl font-semibold mb-4">Smooth Animations</h3>
+                        <p class="text-lg opacity-80">
+                            Engage your audience with fluid transitions and captivating motion graphics that enhance user experience.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="card-container p-4">
+                    <div class="card-inner flex flex-col items-center justify-center text-center">
+                        <svg class="w-20 h-20 mb-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.5 3-9s-1.343-9-3-9m0 18v-3m0-8V3"></path>
+                        </svg>
+                        <h3 class="text-3xl font-semibold mb-4">Interactive Elements</h3>
+                        <p class="text-lg opacity-80">
+                            Bring your content to life with immersive elements that respond to user interaction.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="card-container p-4">
+                    <div class="card-inner flex flex-col items-center justify-center text-center">
+                        <svg class="w-20 h-20 mb-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <h3 class="text-3xl font-semibold mb-4">High Performance</h3>
+                        <p class="text-lg opacity-80">
+                            Optimized for speed and efficiency, ensuring a fast and fluid experience for all users.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="card-container p-4">
+                    <div class="card-inner flex flex-col items-center justify-center text-center">
+                        <svg class="w-20 h-20 mb-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="text-3xl font-semibold mb-4">User-Centric Design</h3>
+                        <p class="text-lg opacity-80">
+                            Crafted with the user in mind, providing intuitive navigation and an enjoyable interface.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="card-container p-4">
+                    <div class="card-inner flex flex-col items-center justify-center text-center">
+                        <svg class="w-20 h-20 mb-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3m0 0l3-3m-3 3v4m0 0a3 3 0 01-3 3H5a3 3 0 01-3-3V7a3 3 0 013-3h12a3 3 0 013 3v4m-3 4V7m-3 0V4"></path>
+                        </svg>
+                        <h3 class="text-3xl font-semibold mb-4">Scalable Architecture</h3>
+                        <p class="text-lg opacity-80">
+                            Built on a robust and scalable foundation, ready to grow with your evolving needs.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-20 px-6 bg-gray-800 min-h-screen flex items-center justify-center fade-in-on-scroll" id="testimonials">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 text-pink-300">
+                What Our Clients Say
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <!-- Testimonial Card 1 -->
+                <div class="card-container testimonial-card p-4">
+                    <div class="card-inner flex flex-col items-center justify-center text-center">
+                        <span class="quote-icon mb-4">&ldquo;</span>
+                        <p class="text-lg mb-4 opacity-90">
+                            "The attention to detail and the interactive elements truly set Nexus apart. Our website has never looked this good!"
+                        </p>
+                        <p class="font-semibold text-xl text-indigo-200">- Jane Doe, CEO of InnovateCorp</p>
+                    </div>
+                </div>
+
+                <!-- Testimonial Card 2 -->
+                <div class="card-container testimonial-card p-4">
+                    <div class="card-inner flex flex-col items-center justify-center text-center">
+                        <span class="quote-icon mb-4">&ldquo;</span>
+                        <p class="text-lg mb-4 opacity-90">
+                            "Professional, creative, and highly responsive. Nexus transformed our online presence beyond expectations."
+                        </p>
+                        <p class="font-semibold text-xl text-green-200">- John Smith, Marketing Director at GrowthX</p>
+                    </div>
+                </div>
+
+                <!-- Testimonial Card 3 -->
+                <div class="card-container testimonial-card p-4">
+                    <div class="card-inner flex flex-col items-center justify-center text-center">
+                        <span class="quote-icon mb-4">&ldquo;</span>
+                        <p class="text-lg mb-4 opacity-90">
+                            "The digital effects are simply stunning! Our customers are spending more time on our site now."
+                        </p>
+                        <p class="font-semibold text-xl text-yellow-200">- Emily White, Founder of Visionary Startups</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- More Features / Services Section -->
+    <section class="py-20 px-6 bg-gray-900 min-h-screen flex items-center justify-center fade-in-on-scroll" id="services">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 text-blue-300">
+                Our Services & Expertise
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <!-- Service Card 1 -->
+                <div class="card-container p-4">
+                    <div class="card-inner flex flex-col items-center justify-center text-center">
+                        <svg class="w-20 h-20 mb-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L19.5 7.25M21 12.75V19.5a2.25 2.25 0 01-2.25 2.25H4.5A2.25 2.25 0 012.25 19.5V7.25A2.25 2.25 0 014.5 5H11"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.75 5.25L14.25 6.75M16.5 4.5L15 6M18 3.75L16.5 5.25M17.25 6.75L18.75 5.25"></path>
+                        </svg>
+                        <h3 class="text-3xl font-semibold mb-4">Custom Web Development</h3>
+                        <p class="text-lg opacity-80">
+                            Tailored solutions built from the ground up to meet your unique business requirements.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Service Card 2 -->
+                <div class="card-container p-4">
+                    <div class="card-inner flex flex-col items-center justify-center text-center">
+                        <svg class="w-20 h-20 mb-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="text-3xl font-semibold mb-4">UI/UX Design</h3>
+                        <p class="text-lg opacity-80">
+                            Creating intuitive and engaging user interfaces for an exceptional user experience.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Service Card 3 -->
+                <div class="card-container p-4">
+                    <div class="card-inner flex flex-col items-center justify-center text-center">
+                        <svg class="w-20 h-20 mb-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.5 3-9s-1.343-9-3-9m0 18v-3m0-8V3"></path>
+                        </svg>
+                        <h3 class="text-3xl font-semibold mb-4">Performance Optimization</h3>
+                        <p class="text-lg opacity-80">
+                            Ensuring your website loads fast and performs smoothly across all devices.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+     <!-- Contact Section -->
+    <section class="py-20 px-6 bg-gray-800 min-h-screen flex items-center justify-center fade-in-on-scroll" id="contact-section">
+        <div class="max-w-4xl mx-auto w-full">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-12 text-purple-300">
+                Get in Touch
+            </h2>
+            <p class="text-xl text-center mb-10 opacity-90">
+                We'd love to hear from you! Fill out the form below or reach out directly.
+            </p>
+
+            <div class="bg-gray-700 rounded-xl p-8 shadow-lg max-w-2xl mx-auto">
+                <form action="#" method="POST" class="space-y-6">
+                    <div>
+                        <label for="name" class="block text-lg font-medium text-gray-200 mb-2">Name</label>
+                        <input type="text" id="name" name="name" class="w-full px-4 py-3 rounded-md bg-gray-900 border border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Your Name" required>
+                    </div>
+                    <div>
+                        <label for="email" class="block text-lg font-medium text-gray-200 mb-2">Email</label>
+                        <input type="email" id="email" name="email" class="w-full px-4 py-3 rounded-md bg-gray-900 border border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="your@example.com" required>
+                    </div>
+                    <div>
+                        <label for="message" class="block text-lg font-medium text-gray-200 mb-2">Message</label>
+                        <textarea id="message" name="message" rows="6" class="w-full px-4 py-3 rounded-md bg-gray-900 border border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Your message..." required></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="animated-gradient-button px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl">
+                            Send Message
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-10 text-center text-gray-400">
+                    <p class="mb-2">Or connect with us directly:</p>
+                    <p class="text-lg">Email: <a href="https://mail.google.com/mail/u/0/#inbox?compose=new" class="text-purple-400 hover:underline">info@nexus.com</a></p>
+                    <p class="text-lg">Phone: <a href="tel:+1234567890" class="text-purple-400 hover:underline">+1 (234) 567-890</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 py-12 px-6 text-center text-gray-400" id="contact">
+        <div class="max-w-7xl mx-auto flex flex-col items-center gap-6">
+            <p class="mb-4">&copy; Badshah All rights reserved.</p>
+            <div class="flex justify-center space-x-6 mb-6">
+                <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.22 8.22 0 01-2.606.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.4-4.286 4.104 4.104 0 001.27 5.477A4.073 4.073 0 01.8 10.70c-.095 0-.187 0-.275.007a4.102 4.102 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.226 8.226 0 010 18.293a11.616 11.616 0 006.29 1.84"></path>
+                    </svg>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33V22C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd"></path>
+                    </svg>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.715.056 8.825.384 9.47 4.072 9.513 9.479.054 5.407-.015 6.05-.056 9.479-.046.93-.33 1.638-.724 2.072-.516.574-1.171.942-2.072.722-1.285-.152-1.745-.324-4.214-.324-2.428 0-2.812.016-3.723.056-.957.04-1.612.33-2.073.721-.573.516-.942 1.17-1.284 2.072-.212 1.285-.324 1.745-.324 4.214 0 2.428.016 2.812.056 3.723.04 1.285.33 1.638.721 2.072.574.516 1.17.942 2.072 1.284 1.285.212 1.745.324 4.214.324 2.428 0 2.812-.016 3.723-.056.957-.04 1.612-.33 2.073-.721.573-.516.942-1.17.721-2.072-.152-1.285-.324-1.745-.324-4.214 0-2.428.016-2.812-.056-3.723-.04-.957-.33-1.612-.721-2.073-.516-.573-1.17-.942-2.072-1.284-1.285-.212-1.745-.324-4.214-.324zm-1.854 4.232c-1.353-.081-1.8-.234-2.484-.575-.54-.265-.918-.567-1.305-.954-.386-.387-.688-.765-.954-1.305-.34-.684-.494-1.131-.575-2.484-.08-1.353-.08-1.8-.08-4.242 0-2.428 0-2.81-.08-4.242-.081-1.353-.234-1.8-.575-2.484-.265-.54-.567-.918-.954-1.305-.387-.386-.688-.765-.954-1.305-.34-.684-.494-1.131-.575-2.484-.08-1.353-.08-1.8-.08-4.242-.08-2.428 0-2.81-.08-4.242-.08-1.353-.081-1.8-.234-2.484-.575-.54-.265-.918-.567-1.305-.954-.386-.387-.688-.765-.954-1.305-.34-.684-.494-1.131-.575-2.484-.08-1.353-.08-1.8-.08-4.242 0-2.428 0-2.81.08-4.242.081-1.353.234-1.8.575-2.484.265-.54.567-.918.954-1.305.387-.386-.765-.688 1.305-.954.684-.34 1.131-.494 2.484-.575 1.353-.08 1.8-.08 4.242-.08 2.428 0 2.81.08 4.242.08 1.353.081 1.8.234 2.484.575.54.265.918.567 1.305.954.386.387.688.765.954 1.305.34.684.494 1.131.575 2.484.08 1.353.08 1.8.08 4.242 0 2.428 0 2.81-.08 4.242z"></path>
+                    </svg>
+                </a>
+            </div>
+            <div class="footer-links">
+                <a href="#home" class="navbar-link text-gray-400 hover:text-white">Home</a>
+                <a href="#features" class="navbar-link text-gray-400 hover:text-white">Features</a>
+                <a href="#testimonials" class="navbar-link text-gray-400 hover:text-white">Testimonials</a>
+                <a href="#services" class="navbar-link text-gray-400 hover:text-white">Services</a>
+                <a href="#contact" class="navbar-link text-gray-400 hover:text-white">Contact</a>
+            </div>
+        </div>
+    </footer>
+    <!-- JAVASCRIPT EXTERNAL LINK -->
+
+  <script src="script.js"></script>
+  
+</body>
+</html>
